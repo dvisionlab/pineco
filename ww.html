@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test Web Workers</title>
+
+    <style>
+      #spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        /* animation: spin 2s linear infinite; */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test Web Workers</h1>
+
+    <!-- add a rotating spinner using pure js -->
+    <div id="spinner"></div>
+    <script>
+      var spinner = document.getElementById("spinner");
+      var rotate = 0;
+      setInterval(() => {
+        rotate += 10;
+        spinner.style.transform = `rotate(${rotate}deg)`;
+      }, 100);
+    </script>
+
+    <script>
+      var worker = new Worker("worker.js");
+
+      worker.onmessage = function (e) {
+        console.log("Message received from worker", e);
+        var text = document.createTextNode(` - i: ${e.data}`);
+        document.body.appendChild(text);
+      };
+
+      worker.postMessage("ping");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test Web Workers</title>
+
+    <style>
+      #spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        /* animation: spin 2s linear infinite; */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test Web Workers</h1>
+
+    <!-- add a rotating spinner using pure js -->
+    <div id="spinner"></div>
+    <script>
+      var spinner = document.getElementById("spinner");
+      var rotate = 0;
+      setInterval(() => {
+        rotate += 10;
+        spinner.style.transform = `rotate(${rotate}deg)`;
+      }, 100);
+    </script>
+
+    <script>
+      const image1 = "2.25.141943277300308328646128274728025006035"; // 52 mb
+      const image2 = "2.25.127766966279065287984140570760102964942"; // 54 mb
+      const baseUrl =
+        "http://172.10.19.35:8042/wado?requestType=WADO&contentType=application/dicom&objectUID=";
+
+      var worker1 = new Worker("downloadWorker.js");
+      var worker2 = new Worker("downloadWorker.js");
+
+      setTimeout(async () => {
+        console.log("run1");
+        console.time("fetch1");
+        worker1.postMessage(`${baseUrl}${image1}`);
+        worker1.onmessage = function (e) {
+          console.log("Message received from worker", e.data);
+          console.timeEnd("fetch1");
+        };
+      }, 2000);
+
+      setTimeout(async () => {
+        console.log("run2");
+        console.time("fetch2");
+        worker2.postMessage(`${baseUrl}${image2}`);
+        worker2.onmessage = function (e) {
+          console.log("Message received from worker", e.data);
+          console.timeEnd("fetch2");
+        };
+      }, 2000);
+    </script>
+  </body>
+</html>
