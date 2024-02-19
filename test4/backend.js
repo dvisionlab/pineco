@@ -33,6 +33,7 @@ async function downloadData(url, name) {
     }
     console.timeEnd(name);
     console.log("download done", name, data[name].length);
+    global.gc();
     resolve();
   });
 }

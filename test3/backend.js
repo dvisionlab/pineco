@@ -26,6 +26,17 @@ downloadData = async (url, name) => {
         newArr.set(data[name]);
         newArr.set(value, data[name].length);
         data[name] = newArr;
+        if (data[name].length % 1000 === 0) {
+          console.log(
+            "downloaded",
+            name,
+            data[name].length / 1024 / 1024,
+            "mb"
+          );
+          global.gc();
+        }
+        newArr = null;
+        delete newArr;
       }
     }
     console.timeEnd(name);
@@ -34,13 +45,12 @@ downloadData = async (url, name) => {
   });
 };
 
-Promise.all([
-  downloadData(`${baseUrl}${image1}`, "fetch1"),
-  downloadData(`${baseUrl}${image2}`, "fetch2")
-]).then(() => {
-  console.log("open ws");
-  // console.log("data", data);
-  openWs();
+downloadData(`${baseUrl}${image1}`, "fetch1").then(() => {
+  downloadData(`${baseUrl}${image2}`, "fetch2").then(() => {
+    console.log("open ws");
+    // console.log("data", data);
+    openWs();
+  });
 });
 
 openWs = () => {
