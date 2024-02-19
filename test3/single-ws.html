@@ -29,26 +29,22 @@
       }, 100);
     </script>
 
-    <script>
-      const image1 = "2.25.141943277300308328646128274728025006035"; // 52 mb
-      const image2 = "2.25.127766966279065287984140570760102964942"; // 54 mb
-      const baseUrl =
-        "http://172.10.19.35:8042/wado?requestType=WADO&contentType=application/dicom&objectUID=";
+    <script src="../fe-config.js"></script>
 
-      var worker1 = new Worker("worker.js");
-      var worker2 = new Worker("worker.js");
+    <script>
+      var worker1 = new Worker("../worker.js");
+      var worker2 = new Worker("../worker.js");
 
       const data = {
-        image1: null,
-        image2: null
+        imageA: null,
+        imageB: null
       };
 
       // spawn the worker and send a message to fetch the image
-      function runWorkerDownload(worker, image) {
+      function runWorkerDownload(worker, image, port) {
         return new Promise((resolve, reject) => {
-          worker.postMessage(image);
+          worker.postMessage({ url: window.config.serverUrl, image, port });
           worker.onmessage = function (e) {
-            console.log("Message received from worker", e.data);
             resolve(e.data);
           };
         });
@@ -58,27 +54,22 @@
       console.time("Total download time");
 
       Promise.all([
-        runWorkerDownload(worker1, `fetch1`),
-        runWorkerDownload(worker2, `fetch2`)
+        runWorkerDownload(worker1, `imageA`, 8080),
+        runWorkerDownload(worker2, `imageB`, 8080)
       ]).then(values => {
         console.timeEnd("Total download time");
-        console.log("values", values);
-        values.map((value, index) => {
-          data[`image${index + 1}`] = value;
-          createDownloadButton(
-            data[`image${index + 1}`],
-            `image${index + 1}.dcm`
-          );
-        });
+        createDownloadButton(values);
       });
 
       // function that creates a button to download the blob
-      function createDownloadButton(data, filename) {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(new Blob([data]));
-        a.download = filename;
-        a.textContent = filename;
-        document.body.appendChild(a);
+      function createDownloadButton(values) {
+        values.map((value, index) => {
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(new Blob([value]));
+          a.download = index + ".dcm";
+          a.textContent = index + ".dcm";
+          document.body.appendChild(a);
+        });
       }
     </script>
   </body>

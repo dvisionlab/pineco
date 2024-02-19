@@ -1,111 +1,21 @@
-const WebSocket = require("ws");
-
-const image1 = "2.25.141943277300308328646128274728025006035"; // 52 mb
-const image2 = "2.25.127766966279065287984140570760102964942"; // 54 mb
-
-const image3 = "1.3.76.2.3.3.347459482.35.1.1.1.20111229140709421"; // 11 mb
-const image4 = "1.3.76.2.3.3.347459482.35.1.4.1.20111229141147812"; // 12 mb
-
-const baseUrl =
-  "http://172.10.19.35:8042/wado?requestType=WADO&contentType=application/dicom&objectUID=";
+const { downloadData, openWs } = require("../common.js");
+const config = require("../config.js");
+console.log("config", config);
 
 let data = {
-  fetch1: new Uint8Array(),
-  fetch2: new Uint8Array()
+  imageA: null,
+  imageB: null
 };
 
-function toMb(input) {
-  return input / 1024 / 1024;
-}
-
-async function downloadData(url, name) {
-  console.log("run");
-  return new Promise(async (resolve, reject) => {
-    console.time(name);
-    let res = await fetch(url);
-    const reader = res.body.getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        // console.log("done");
-        break;
-      } else {
-        let newArr = new Uint8Array(data[name].length + value.length);
-        newArr.set(data[name]);
-        newArr.set(value, data[name].length);
-        data[name] = newArr;
-        newArr = null;
-        delete newArr;
-        if (data[name].length % 1000 === 0) {
-          console.log("downloaded", data[name].length / 1024 / 1024, "mb");
-          global.gc();
-          const mem = process.memoryUsage();
-          console.log(
-            "memory",
-            toMb(mem.rss),
-            toMb(mem.heapTotal),
-            toMb(mem.heapUsed),
-            toMb(mem.external),
-            toMb(mem.arrayBuffers)
-          );
-        }
+downloadData(`${config.pacsBaseUrl}${config.imageA}`, "imageA").then(
+  contentA => {
+    data.imageA = contentA;
+    downloadData(`${config.pacsBaseUrl}${config.imageB}`, "imageB").then(
+      contentB => {
+        data.imageB = contentB;
+        openWs(data, 8081);
+        openWs(data, 8082);
       }
-    }
-    console.timeEnd(name);
-    console.log("download done", name, data[name].length);
-    resolve();
-  });
-}
-
-downloadData(`${baseUrl}${image3}`, "fetch1").then(() => {
-  downloadData(`${baseUrl}${image4}`, "fetch2").then(() => {
-    // console.log("data", data);
-    openWs(8081);
-    openWs(8082);
-
-    setInterval(() => {
-      global.gc();
-      const mem = process.memoryUsage();
-      console.log(
-        "memory",
-        toMb(mem.rss),
-        toMb(mem.heapTotal),
-        toMb(mem.heapUsed),
-        toMb(mem.external),
-        toMb(mem.arrayBuffers)
-      );
-    }, 1000);
-  });
-});
-
-function openWs(port) {
-  console.log("open ws", port);
-  // Create a WebSocket server
-  const wss = new WebSocket.Server({ port });
-
-  const queue = [];
-
-  // Event handler for new WebSocket connections
-  wss.on("connection", ws => {
-    // Event handler for incoming messages
-    ws.on("message", msg => {
-      const name = msg.toString();
-      queue.push(name);
-      console.time("download:" + name);
-      console.log("Received message:", name);
-
-      ws.send(data[name]);
-    });
-
-    // Event handler for WebSocket connection close
-    ws.on("close", e => {
-      console.log("WebSocket connection closed", e);
-      console.timeEnd("download:" + queue[0]);
-      queue.shift();
-    });
-
-    // ws.send("Ready");
-  });
-
-  console.log("WebSocket server is listening on port " + port);
-}
+    );
+  }
+);
