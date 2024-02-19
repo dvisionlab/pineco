@@ -26,6 +26,9 @@ async function downloadData(url, name) {
         newArr.set(data[name]);
         newArr.set(value, data[name].length);
         data[name] = newArr;
+        if (data[name].length % 1000 === 0) {
+          console.log("downloaded", data[name].length / 1024 / 1024, "mb");
+        }
       }
     }
     console.timeEnd(name);
@@ -34,13 +37,12 @@ async function downloadData(url, name) {
   });
 }
 
-Promise.all([
-  downloadData(`${baseUrl}${image1}`, "fetch1"),
-  downloadData(`${baseUrl}${image2}`, "fetch2")
-]).then(() => {
-  // console.log("data", data);
-  openWs(8081);
-  openWs(8082);
+downloadData(`${baseUrl}${image1}`, "fetch1").then(() => {
+  downloadData(`${baseUrl}${image2}`, "fetch2").then(() => {
+    // console.log("data", data);
+    openWs(8081);
+    openWs(8082);
+  });
 });
 
 function openWs(port) {

@@ -9,7 +9,8 @@ onmessage = async e => {
     fetch2: 8082
   };
 
-  const ws = new WebSocket("ws://localhost:" + ports[e.data]);
+  // const ws = new WebSocket("ws://localhost:" + ports[e.data]);
+  const ws = new WebSocket("ws://172.10.19.3:" + ports[e.data]);
   ws.onopen = () => {
     console.log("Connected to ws, sending request: ", e.data);
     ws.send(e.data);

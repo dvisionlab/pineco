@@ -58,8 +58,8 @@
       console.time("Total download time");
 
       Promise.all([
-        runWorkerDownload(worker1, `fetch1`),
-        runWorkerDownload(worker2, `fetch2`)
+        runWorkerDownload(worker1, `fetch1`)
+        // runWorkerDownload(worker2, `fetch2`)
       ]).then(values => {
         console.timeEnd("Total download time");
         console.log("values", values);
