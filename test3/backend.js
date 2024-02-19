@@ -5,6 +5,9 @@ const image2 = "2.25.127766966279065287984140570760102964942"; // 54 mb
 const baseUrl =
   "http://172.10.19.35:8042/wado?requestType=WADO&contentType=application/dicom&objectUID=";
 
+const image3 = "1.3.76.2.3.3.347459482.35.1.1.1.20111229140709421"; // 11 mb
+const image4 = "1.3.76.2.3.3.347459482.35.1.4.1.20111229141147812"; // 12 mb
+
 let data = {
   fetch1: new Uint8Array(),
   fetch2: new Uint8Array()
@@ -41,8 +44,8 @@ downloadData = async (url, name) => {
   });
 };
 
-downloadData(`${baseUrl}${image1}`, "fetch1").then(() => {
-  downloadData(`${baseUrl}${image2}`, "fetch2").then(() => {
+downloadData(`${baseUrl}${image3}`, "fetch1").then(() => {
+  downloadData(`${baseUrl}${image4}`, "fetch2").then(() => {
     console.log("open ws");
     // console.log("data", data);
     openWs();
