@@ -26,17 +26,13 @@ downloadData = async (url, name) => {
         newArr.set(data[name]);
         newArr.set(value, data[name].length);
         data[name] = newArr;
-        if (data[name].length % 1000 === 0) {
-          console.log(
-            "downloaded",
-            name,
-            data[name].length / 1024 / 1024,
-            "mb"
-          );
-          global.gc();
-        }
         newArr = null;
         delete newArr;
+        if (data[name].length % 1000 === 0) {
+          console.log("downloaded", data[name].length / 1024 / 1024, "mb");
+          global.gc();
+          console.log("memory", process.memoryUsage());
+        }
       }
     }
     console.timeEnd(name);

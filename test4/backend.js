@@ -10,6 +10,10 @@ let data = {
   fetch2: new Uint8Array()
 };
 
+function toMb(input) {
+  return input / 1024 / 1024;
+}
+
 async function downloadData(url, name) {
   console.log("run");
   return new Promise(async (resolve, reject) => {
@@ -26,14 +30,25 @@ async function downloadData(url, name) {
         newArr.set(data[name]);
         newArr.set(value, data[name].length);
         data[name] = newArr;
+        newArr = null;
+        delete newArr;
         if (data[name].length % 1000 === 0) {
           console.log("downloaded", data[name].length / 1024 / 1024, "mb");
+          global.gc();
+          const mem = process.memoryUsage();
+          console.log(
+            "memory",
+            toMb(mem.rss),
+            toMb(mem.heapTotal),
+            toMb(mem.heapUsed),
+            toMb(mem.external),
+            toMb(mem.arrayBuffers)
+          );
         }
       }
     }
     console.timeEnd(name);
     console.log("download done", name, data[name].length);
-    global.gc();
     resolve();
   });
 }
@@ -43,6 +58,19 @@ downloadData(`${baseUrl}${image1}`, "fetch1").then(() => {
     // console.log("data", data);
     openWs(8081);
     openWs(8082);
+
+    setInterval(() => {
+      global.gc();
+      const mem = process.memoryUsage();
+      console.log(
+        "memory",
+        toMb(mem.rss),
+        toMb(mem.heapTotal),
+        toMb(mem.heapUsed),
+        toMb(mem.external),
+        toMb(mem.arrayBuffers)
+      );
+    }, 1000);
   });
 });
 
