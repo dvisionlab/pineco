@@ -2,6 +2,10 @@ const WebSocket = require("ws");
 
 const image1 = "2.25.141943277300308328646128274728025006035"; // 52 mb
 const image2 = "2.25.127766966279065287984140570760102964942"; // 54 mb
+
+const image3 = "1.3.76.2.3.3.347459482.35.1.1.1.20111229140709421"; // 11 mb
+const image4 = "1.3.76.2.3.3.347459482.35.1.4.1.20111229141147812"; // 12 mb
+
 const baseUrl =
   "http://172.10.19.35:8042/wado?requestType=WADO&contentType=application/dicom&objectUID=";
 
@@ -53,8 +57,8 @@ async function downloadData(url, name) {
   });
 }
 
-downloadData(`${baseUrl}${image1}`, "fetch1").then(() => {
-  downloadData(`${baseUrl}${image2}`, "fetch2").then(() => {
+downloadData(`${baseUrl}${image3}`, "fetch1").then(() => {
+  downloadData(`${baseUrl}${image4}`, "fetch2").then(() => {
     // console.log("data", data);
     openWs(8081);
     openWs(8082);
