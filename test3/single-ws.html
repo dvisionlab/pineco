@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test Web Workers</title>
+
+    <style>
+      #spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        /* animation: spin 2s linear infinite; */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test Web Workers</h1>
+
+    <!-- add a rotating spinner using pure js -->
+    <div id="spinner"></div>
+    <!-- <button onclick="run">Run test</button> -->
+    <script>
+      var spinner = document.getElementById("spinner");
+      var rotate = 0;
+      setInterval(() => {
+        rotate += 10;
+        spinner.style.transform = `rotate(${rotate}deg)`;
+      }, 100);
+    </script>
+
+    <script>
+      const image1 = "2.25.141943277300308328646128274728025006035"; // 52 mb
+      const image2 = "2.25.127766966279065287984140570760102964942"; // 54 mb
+      const baseUrl =
+        "http://172.10.19.35:8042/wado?requestType=WADO&contentType=application/dicom&objectUID=";
+
+      var worker1 = new Worker("worker.js");
+      var worker2 = new Worker("worker.js");
+
+      const data = {
+        image1: null,
+        image2: null
+      };
+
+      // spawn the worker and send a message to fetch the image
+      function runWorkerDownload(worker, image) {
+        return new Promise((resolve, reject) => {
+          worker.postMessage(image);
+          worker.onmessage = function (e) {
+            console.log("Message received from worker", e.data);
+            resolve(e.data);
+          };
+        });
+      }
+
+      console.warn("Start downloading images");
+      console.time("Total download time");
+
+      Promise.all([
+        runWorkerDownload(worker1, `fetch1`),
+        runWorkerDownload(worker2, `fetch2`)
+      ]).then(values => {
+        console.timeEnd("Total download time");
+        console.log("values", values);
+        values.map((value, index) => {
+          data[`image${index + 1}`] = value;
+          createDownloadButton(
+            data[`image${index + 1}`],
+            `image${index + 1}.dcm`
+          );
+        });
+      });
+
+      // function that creates a button to download the blob
+      function createDownloadButton(data, filename) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([data]));
+        a.download = filename;
+        a.textContent = filename;
+        document.body.appendChild(a);
+      }
+    </script>
+  </body>
+</html>

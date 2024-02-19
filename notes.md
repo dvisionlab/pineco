@@ -11,3 +11,9 @@ Se strozzo la rete a 10 megabit, entrambe hanno esattamente lo stesso tempo di d
 ## Next
 
 Provare con un server utilizzando le websocket per il download.
+
+| Test  | Descr |
+| ----- | ----- |
+| Test1 | ...   |
+| Test2 | ...   |
+| Test2 | ...   |
