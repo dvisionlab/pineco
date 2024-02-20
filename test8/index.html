@@ -55,22 +55,10 @@
 
       Promise.all([
         runWorkerDownload(worker1, `imageA`, 8081),
-        runWorkerDownload(worker2, `imageB`, 8084)
+        runWorkerDownload(worker2, `imageB`, 8082)
       ]).then(values => {
         console.timeEnd("Total download time");
-        createDownloadButton(values);
       });
-
-      // function that creates a button to download the blob
-      function createDownloadButton(values) {
-        values.map((value, index) => {
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(new Blob([value]));
-          a.download = index + ".dcm";
-          a.textContent = index + ".dcm";
-          document.body.appendChild(a);
-        });
-      }
     </script>
   </body>
 </html>

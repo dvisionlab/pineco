@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test Web Workers</title>
+
+    <style>
+      #spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        /* animation: spin 2s linear infinite; */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test Web Workers</h1>
+
+    <!-- add a rotating spinner using pure js -->
+    <div id="spinner"></div>
+    <!-- <button onclick="run">Run test</button> -->
+    <script>
+      var spinner = document.getElementById("spinner");
+      var rotate = 0;
+      setInterval(() => {
+        rotate += 10;
+        spinner.style.transform = `rotate(${rotate}deg)`;
+      }, 100);
+    </script>
+
+    <script src="../fe-config.js"></script>
+
+    <script>
+      const data = {
+        imageA: null,
+        imageB: null
+      };
+
+      let first = true;
+
+      const worker1 = new Worker("./worker.js");
+      worker1.onmessage = async function (e) {
+        if (first) {
+          console.timeEnd("imageA");
+          console.log("imageA", e.data);
+          first = false;
+        } else {
+          console.timeEnd("imageB");
+          console.log("imageB", e.data);
+          console.timeEnd("Total download time");
+          // let a = await data.imageA.arrayBuffer();
+          // let b = await data.imageB.arrayBuffer();
+          // console.log(
+          //   "Downloaded images",
+          //   new Uint8Array(data.imageA),
+          //   new Uint8Array(data.imageB)
+          // );
+        }
+      };
+
+      setTimeout(() => {
+        console.time("Total download time");
+        console.time("imageA");
+        worker1.postMessage({ image: "imageA" });
+      }, 1000);
+
+      setTimeout(() => {
+        console.time("imageB");
+        worker1.postMessage({ image: "imageB" });
+      }, 1100);
+    </script>
+  </body>
+</html>

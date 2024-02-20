@@ -1,19 +1,69 @@
 [Orthanc multithread](https://orthanc.uclouvain.be/book/faq/scalability.html)
 
-## Test1
+# Tests ww | ws
 
-- `fetch.html` fa download in streaming da orthanc di due immagini da ca. 50 mb in parallelo dal "main"
-- `fetch-ww.html` fa downlaod delle stesse due immagini ma spawnando due webworker
+## immagini da 28/29 mb
 
-Risultato: i tempi di download sono molto simili se lascio la rete al massimo (100 megabit/s), circa 8 e 11 secondi per le due serie rispettivamente. La serie che ci mette di più sembra andare più piano mentre anche l'altra è in download.
-Se strozzo la rete a 10 megabit, entrambe hanno esattamente lo stesso tempo di download (1.5 min) con entrambi i metodi.
+### Test4 (2ww+2ws)
 
-## Next
+| imgA | imgB | Tot |
+| ---- | ---- | --- |
+| 5.7  | 5.8  | 6.3 |
+| 4.0  | 8.5  | 9.0 |
+| 5.1  | 6.0  | 6.5 |
+| 3.6  | 8.9  | 9.3 |
+| 3.8  | 9.2  | 9.6 |
+| 3.9  | 8.3  | 8.7 |
+| 4.7  | 7.2  | 7.6 |
+| 4.0  | 8.0  | 8.5 |
+| 5.6  | 5.9  | 6.4 |
 
-Provare con un server utilizzando le websocket per il download.
+### Test3 (2ww+1ws)
 
-| Test  | Descr |
-| ----- | ----- |
-| Test1 | ...   |
-| Test2 | ...   |
-| Test2 | ...   |
+| imgA | imgB | Tot  |
+| ---- | ---- | ---- |
+| 3.9  | 8.8  | 9.3  |
+| 3.6  | 9.3  | 9.7  |
+| 3.4  | 10.4 | 10.8 |
+| 5.0  | 7.2  | 7.6  |
+| 4.1  | 7.4  | 7.8  |
+| 3.7  | 9.7  | 10.0 |
+| 4.0  | 8.1  | 8.6  |
+| 3.6  | 8.5  | 9.0  |
+| 3.4  | 10.6 | 11.0 |
+
+## immagini da 11/12 mb
+
+### Test4 (2ww+2ws)
+
+| imgA | imgB | Tot |
+| ---- | ---- | --- |
+| 2.1  | 2.6  | 3.0 |
+| 1.4  | 5.0  | 5.3 |
+| 1.8  | 3.4  | 3.7 |
+| 1.3  | 6.9  | 7.2 |
+| 1.8  | 2.5  | 2.8 |
+
+### Test3 (2ww+1ws)
+
+| imgA | imgB | Tot |
+| ---- | ---- | --- |
+| 1.4  | 7.1  | 7.4 |
+| 1.5  | 5.2  | 5.5 |
+| 1.5  | 4.4  | 4.8 |
+| 1.4  | 5.2  | 5.5 |
+| 1.9  | 3.0  | 3.3 |
+
+## doppia istanza be (2ww con 2 ws su 2 be diversi)
+
+| imgA | imgB | Tot |
+| ---- | ---- | --- |
+| 3.2  | 1.9  | 3.6 |
+| 2.5  | 2.3  | 2.9 |
+| 2.1  | 2.7  | 3.0 |
+| 2.3  | 2.5  | 2.8 |
+| 2.6  | 2.2  | 2.9 |
+| 2.0  | 2.8  | 3.1 |
+| 2.4  | 2.4  | 2.7 |
+| 2.7  | 1.9  | 3.0 |
+| 2.4  | 2.4  | 2.8 |
